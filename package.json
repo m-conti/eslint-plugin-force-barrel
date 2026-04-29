@@ -1,0 +1,55 @@
+{
+  "name": "eslint-plugin-force-barrel",
+  "version": "1.0.0",
+  "description": "An ESLint plugin to enforce importing from barrel files (indexes) instead of reaching deep into internal folder structures.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/m-conti/force-barrel.git"
+  },
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin",
+    "barrel"
+  ],
+  "author": "m-conti",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/m-conti/force-barrel/issues"
+  },
+  "homepage": "https://github.com/m-conti/force-barrel#readme",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
+  "imports": {
+    "#lib/*": "./lib/*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "@typescript-eslint/parser": "^8.59.1",
+    "@typescript-eslint/rule-tester": "^8.59.1",
+    "@typescript-eslint/utils": "^8.59.1",
+    "eslint": "^10.2.1",
+    "typescript": "^6.0.3",
+    "unplugin-swc": "^1.5.9",
+    "vitest": "^3.2.4"
+  },
+  "type": "module"
+}
