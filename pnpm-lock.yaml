@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@typescript-eslint/utils':
-        specifier: ^8.59.1
-        version: 8.59.1(eslint@10.2.1)(typescript@6.0.3)
     devDependencies:
       '@types/node':
         specifier: ^25.6.0
@@ -19,6 +15,9 @@ importers:
         specifier: ^8.59.1
         version: 8.59.1(eslint@10.2.1)(typescript@6.0.3)
       '@typescript-eslint/rule-tester':
+        specifier: ^8.59.1
+        version: 8.59.1(eslint@10.2.1)(typescript@6.0.3)
+      '@typescript-eslint/utils':
         specifier: ^8.59.1
         version: 8.59.1(eslint@10.2.1)(typescript@6.0.3)
       eslint:

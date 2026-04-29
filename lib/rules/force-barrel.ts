@@ -2,7 +2,7 @@
  * @fileoverview Force barrel exports
  * @author ESLint Plugin
  */
-import { TSESLint } from '@typescript-eslint/utils';
+import type { TSESLint } from '@typescript-eslint/utils';
 
 type Options = [{ paths: string[] }];
 
