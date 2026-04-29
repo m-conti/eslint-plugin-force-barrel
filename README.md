@@ -121,7 +121,7 @@ This rule exclusively runs inside matching barrel index files (based on your `pa
 
 **Parameters:**
 - `paths`: Array of regex strings describing your barrel structures (Default: `['.*domains/[^/]+']`).
-- `privateRegex`: Regex pattern to identify local private exports (Default: `"^"` - e.g. variables starting with an underscore).
+- `privateRegex`: Regex pattern to identify local private exports (Default: `"^_"` - e.g. variables starting with an underscore).
 
 #### ✔️ Correct (Internal files can export privates)
 ```typescript
