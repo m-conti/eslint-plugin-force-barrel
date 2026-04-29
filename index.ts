@@ -1,17 +1,25 @@
-import forceBarrel from "./lib/rules/force-barrel";
-import noPrivateExports from "./lib/rules/no-private-exports";
+import forceBarrel from "./lib/rules/force-barrel.js";
+import noPrivateExports from "./lib/rules/no-private-exports.js";
 
-export const rules = {
-  "force-barrel": forceBarrel,
-  "no-private-exports": noPrivateExports,
+const plugin = {
+  rules: {
+    "force-barrel": forceBarrel,
+    "no-private-exports": noPrivateExports,
+  },
 };
+
+export const rules = plugin.rules;
 
 export const configs = {
   recommended: {
-    plugins: ["force-barrel"],
+    plugins: {
+      "force-barrel": plugin,
+    },
     rules: {
       "force-barrel/force-barrel": "error",
       "force-barrel/no-private-exports": "error",
     },
   },
 };
+
+export default plugin;
