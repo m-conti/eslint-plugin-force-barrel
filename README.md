@@ -1,7 +1,7 @@
 # eslint-plugin-force-barrel
 
 [![npm](https://img.shields.io/npm/v/eslint-plugin-force-barrel)](https://www.npmjs.com/package/eslint-plugin-force-barrel)
-[![license](https://img.shields.io/github/license/m-conti/force-barrel)](https://github.com/m-conti/force-barrel/blob/main/LICENSE)
+[![license](https://img.shields.io/github/license/m-conti/eslint-plugin-force-barrel)](https://github.com/m-conti/eslint-plugin-force-barrel/blob/main/LICENSE)
 [![bundle size](https://img.shields.io/bundlephobia/min/eslint-plugin-force-barrel)](https://bundlephobia.com/package/eslint-plugin-force-barrel)
 
 An ESLint plugin to enforce importing from barrel files (indexes) instead of reaching deep into internal folder structures.
