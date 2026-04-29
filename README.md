@@ -39,15 +39,15 @@ export default [
         "error",
         {
           paths: [
-            // List of regex patterns identifying your barrel folders
-            ".*domains/[^/]+",
+            // List of glob patterns identifying your barrel folders
+            "**/domains/*",
           ],
         },
       ],
       "force-barrel/no-private-exports": [
         "error",
         {
-          paths: [".*domains/[^/]+"],          // Same regex as above
+          paths: ["**/domains/*"],          // Same glob pattern as above
           privateRegex: "^_"                   // Regex identifying private exports (default: "^_")
         },
       ],
@@ -67,13 +67,13 @@ Add `force-barrel` to the plugins section of your `.eslintrc` configuration file
     "force-barrel/force-barrel": [
       "error",
       {
-        "paths": [".*domains/[^/]+"]
+        "paths": ["**/domains/*"]
       }
     ],
     "force-barrel/no-private-exports": [
       "error",
       {
-        "paths": [".*domains/[^/]+"],
+        "paths": ["**/domains/*"],
         "privateRegex": "^_"
       }
     ]
@@ -89,14 +89,14 @@ This plugin currently provides two core rules:
 
 Enforces that imports from a domain strictly target the domain's public index (barrel) file instead of reaching deep into its folder structure.
 
-If no `paths` configuration is defined, the rule falls back to its default behavior, targeting domains: `['.*domains/[^/]+']`. 
+If no `paths` configuration is defined, the rule falls back to its default behavior, targeting domains: `['**/domains/*']`. 
 
-If an import statement resolves to a folder matched by one of your `paths` regexes but additionally includes a deeper slashes path, this rule will trigger an error preventing developers from bypassing the domain's public index boundary.
+If an import statement resolves to a folder matched by one of your `paths` globs but additionally includes a deeper slashes path, this rule will trigger an error preventing developers from bypassing the domain's public index boundary.
 
 #### ✔️ Correct
 
 ```javascript
-/* eslint force-barrel/force-barrel: ["error", { paths: [".*domains/[^/]+"] }] */
+/* eslint force-barrel/force-barrel: ["error", { paths: ["**/domains/*"] }] */
 
 // Importing cleanly from the barrel boundary
 import { UserAvatar } from 'src/domains/users';
@@ -106,7 +106,7 @@ import { CustomerAPI } from './domains/customer';
 #### ❌ Incorrect
 
 ```javascript
-/* eslint force-barrel/force-barrel: ["error", { paths: [".*domains/[^/]+"] }] */
+/* eslint force-barrel/force-barrel: ["error", { paths: ["**/domains/*"] }] */
 
 // Bypassing the barrel boundary by going deep into the domain folder
 import { UserAvatar } from 'src/domains/users/components/UserAvatar';
@@ -120,7 +120,7 @@ Enforces that internal variables (e.g. constants, helpers) prefixed with a speci
 This rule exclusively runs inside matching barrel index files (based on your `paths` configuration) ensuring the public boundary stays clean while allowing internal shared usage of those private variables *within* the domain.
 
 **Parameters:**
-- `paths`: Array of regex strings describing your barrel structures (Default: `['.*domains/[^/]+']`).
+- `paths`: Array of glob strings describing your barrel structures (Default: `['**/domains/*']`).
 - `privateRegex`: Regex pattern to identify local private exports (Default: `"^_"` - e.g. variables starting with an underscore).
 
 #### ✔️ Correct (Internal files can export privates)

@@ -1,4 +1,5 @@
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
+import { minimatch } from 'minimatch';
 
 type Options = [{ privateRegex?: string; paths?: string[] }];
 
@@ -36,8 +37,7 @@ const rule: TSESLint.RuleModule<"noPrivateExport", Options> = {
     const privateRegex = new RegExp(privateRegexString);
     const paths = (options.paths && options.paths.length > 0) 
       ? options.paths 
-      : ['.*domains/[^/]+'];
-    const pathRegexes = paths.map((p: string) => new RegExp(p));
+      : ['**/domains/*'];
 
     const filename = context.filename || context.physicalFilename;
     if (!filename) {
@@ -45,60 +45,50 @@ const rule: TSESLint.RuleModule<"noPrivateExport", Options> = {
     }
 
     const normalizedFilename = filename.replace(/\\/g, '/');
-    let isBarrel = false;
-    for (const regex of pathRegexes) {
-      const match = normalizedFilename.match(regex);
-      if (match) {
-        const remainder = normalizedFilename.slice(match.index! + match[0].length);
-        if (/^\/index\.(ts|tsx|js|jsx)$/i.test(remainder)) {
-          isBarrel = true;
-          break;
-        }
-      }
-    }
+
+    const isBarrel = paths.some((pattern: string) =>
+      minimatch(normalizedFilename, `${pattern.replace(/\/$/, '')}/index.{ts,tsx,js,jsx}`)
+    );
 
     // Only apply this rule to the matched barrel files
     if (!isBarrel) {
       return {};
     }
 
+    const checkAndReport = (name: string, locNode: TSESTree.Node) => {
+      if (privateRegex.test(name)) {
+        context.report({
+          node: locNode,
+          messageId: "noPrivateExport",
+          data: { exportName: name },
+        });
+      }
+    };
+
     return {
       ExportNamedDeclaration(node: TSESTree.ExportNamedDeclaration) {
-        const exportsToCheck: { name: string; locNode: TSESTree.Node }[] = [];
-
         // Handle `export { _API_ENDPOINTS }`
-        for (const specifier of node.specifiers) {
-          const exportName = specifier.exported.type === 'Identifier' 
-            ? specifier.exported.name 
-            : specifier.exported.value;
+        for (const spec of node.specifiers) {
+          const exportName = spec.exported.type === 'Identifier' 
+            ? spec.exported.name 
+            : spec.exported.value;
           
-          if (typeof exportName === 'string') {
-            exportsToCheck.push({ name: exportName, locNode: specifier });
-          }
+          if (typeof exportName === 'string') checkAndReport(exportName, spec);
         }
 
-        // Handle `export const _API_ENDPOINTS = ...` or `export function _foo() {}`
-        if (node.declaration) {
-          if (node.declaration.type === 'VariableDeclaration') {
-            for (const decl of node.declaration.declarations) {
-              if (decl.id.type === 'Identifier') {
-                exportsToCheck.push({ name: decl.id.name, locNode: decl.id });
-              }
-            }
-          } else if ('id' in node.declaration && node.declaration.id?.type === 'Identifier') {
-            exportsToCheck.push({ name: node.declaration.id.name, locNode: node.declaration.id });
+        if (!node.declaration) return;
+
+        // Handle `export const _API_ENDPOINTS = ...`
+        if (node.declaration.type === 'VariableDeclaration') {
+          for (const decl of node.declaration.declarations) {
+            if (decl.id.type === 'Identifier') checkAndReport(decl.id.name, decl.id);
           }
+          return;
         }
 
-        // Report any exports matching the private regex
-        for (const { name, locNode } of exportsToCheck) {
-          if (privateRegex.test(name)) {
-            context.report({
-              node: locNode,
-              messageId: "noPrivateExport",
-              data: { exportName: name },
-            });
-          }
+        // Handle `export function _foo() {}`
+        if ('id' in node.declaration && node.declaration.id?.type === 'Identifier') {
+          checkAndReport(node.declaration.id.name, node.declaration.id);
         }
       },
     };

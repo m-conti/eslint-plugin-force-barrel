@@ -12,15 +12,15 @@ ruleTester.run('force-barrel', rule, {
   valid: [
     {
       code: "import { a } from './barrel';",
-      options: [{ paths: ["^\\./barrel", "^\\./features"] }]
+      options: [{ paths: ["./barrel", "./features"] }]
     },
     {
       code: "import { a } from './other';",
-      options: [{ paths: ["^\\./barrel", "^\\./features"] }]
+      options: [{ paths: ["./barrel", "./features"] }]
     },
     {
       code: "import { a } from './features';",
-      options: [{ paths: ["^\\./barrel", "^\\./features"] }]
+      options: [{ paths: ["./barrel", "./features"] }]
     },
     {
       code: "import { a } from 'src/domains/users';",
@@ -29,12 +29,12 @@ ruleTester.run('force-barrel', rule, {
   invalid: [
     {
       code: "import { a } from './barrel/a';",
-      options: [{ paths: ["^\\./barrel", "^\\./features"] }],
+      options: [{ paths: ["./barrel", "./features"] }],
       errors: [{ messageId: "useBarrel" }]
     },
     {
       code: "import { a } from './barrel/a/b';",
-      options: [{ paths: ["^\\./barrel", "^\\./features"] }],
+      options: [{ paths: ["./barrel", "./features"] }],
       errors: [{ messageId: "useBarrel" }]
     },
     {
@@ -43,7 +43,7 @@ ruleTester.run('force-barrel', rule, {
     },
     {
       code: "import { a } from './features/core';",
-      options: [{ paths: ["^\\./barrel", "^\\./features"] }],
+      options: [{ paths: ["./barrel", "./features"] }],
       errors: [{ messageId: "useBarrel" }]
     }
   ],

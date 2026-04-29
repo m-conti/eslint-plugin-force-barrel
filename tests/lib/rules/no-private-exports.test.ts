@@ -28,12 +28,12 @@ ruleTester.run('no-private-exports', rule, {
     },
     {
       code: "export { _API_ENDPOINTS } from './constants/api';",
-      options: [{ paths: [".*domains/[^/]+"] }], // A deeper index file isn't the barrel!
+      options: [{ paths: ["**/domains/*"] }], // A deeper index file isn't the barrel!
       filename: '/src/domains/users/components/index.ts',
     },
     {
       code: "export { _PRIVATE } from './something';",
-      options: [{ paths: ["^/src/features/[^/]+"] }], // Not matching domains anymore
+      options: [{ paths: ["/src/features/*"] }], // Not matching domains anymore
       filename: '/src/domains/users/index.ts',
     }
   ],
@@ -41,13 +41,13 @@ ruleTester.run('no-private-exports', rule, {
     {
       code: "export { _API_ENDPOINTS } from './constants/api';",
       filename: '/src/domains/users/index.ts',
-      options: [{ paths: [".*domains/[^/]+"] }], // Explicitly testing default path logic matches
+      options: [{ paths: ["**/domains/*"] }], // Explicitly testing default path logic matches
       errors: [{ messageId: "noPrivateExport", data: { exportName: "_API_ENDPOINTS" } }]
     },
     {
       code: "export { _PRIVATE } from './api';",
       filename: '/src/features/cart/index.ts',
-      options: [{ paths: ["^/src/features/[^/]+"] }], // Explicitly testing custom path array
+      options: [{ paths: ["/src/features/*"] }], // Explicitly testing custom path array
       errors: [{ messageId: "noPrivateExport", data: { exportName: "_PRIVATE" } }]
     },
     {

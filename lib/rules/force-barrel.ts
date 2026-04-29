@@ -3,6 +3,7 @@
  * @author ESLint Plugin
  */
 import type { TSESLint } from '@typescript-eslint/utils';
+import { minimatch } from 'minimatch';
 
 type Options = [{ paths: string[] }];
 
@@ -35,29 +36,34 @@ const rule: TSESLint.RuleModule<"useBarrel", Options> = {
     const options = context.options[0] || {};
     const paths = (options.paths && options.paths.length > 0) 
       ? options.paths 
-      : ['.*domains/[^/]+'];
-    const prefixRegexes = paths.map((p: string) => new RegExp(p));
+      : ['**/domains/*'];
 
     return {
       ImportDeclaration(node) {
         const importPath = node.source.value;
         if (typeof importPath !== 'string') return;
 
-        for (const prefixRegex of prefixRegexes) {
-          const match = importPath.match(prefixRegex);
-          if (!match) continue;
-
-          const remainder = importPath.slice(match.index! + match[0].length);
-          if (remainder.length > 0 && remainder.startsWith('/')) {
-            context.report({
-              node,
-              messageId: "useBarrel",
-              data: {
-                barrelPath: match[0],
-                importPath
+        const parts = importPath.split('/');
+        
+        for (const pattern of paths) {
+          for (let i = 0; i < parts.length; i++) {
+            const currentPath = parts.slice(0, i + 1).join('/');
+            
+            if (minimatch(currentPath, pattern)) {
+              const remainingParts = parts.slice(i + 1);
+              
+              if (remainingParts.length > 0) {
+                context.report({
+                  node,
+                  messageId: "useBarrel",
+                  data: {
+                    barrelPath: currentPath,
+                    importPath
+                  }
+                });
+                return;
               }
-            });
-            return;
+            }
           }
         }
       }

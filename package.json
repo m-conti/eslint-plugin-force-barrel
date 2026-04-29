@@ -52,5 +52,8 @@
   },
   "peerDependencies": {
     "eslint": ">=8.0.0"
+  },
+  "dependencies": {
+    "minimatch": "^10.2.5"
   }
 }
