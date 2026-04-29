@@ -93,10 +93,14 @@ If no `paths` configuration is defined, the rule falls back to its default behav
 
 If an import statement resolves to a folder matched by one of your `paths` globs but additionally includes a deeper slashes path, this rule will trigger an error preventing developers from bypassing the domain's public index boundary.
 
+**Parameters:**
+- `paths` (optional): Array of glob strings describing your barrel structures (Default: `['**/domains/*']`).
+- `autoFix` (optional): Boolean. If set to `true`, the rule will automatically fix imports to point to the barrel file during `eslint --fix`. Note: use with caution as it might break imports if the target isn't actually exported by the barrel file. Default is `false` (it will provide an editor suggestion instead of an auto-fix).
+
 #### ✔️ Correct
 
 ```javascript
-/* eslint force-barrel/force-barrel: ["error", { paths: ["**/domains/*"] }] */
+/* eslint force-barrel/force-barrel: ["error", { paths: ["**/domains/*"], autoFix: false }] */
 
 // Importing cleanly from the barrel boundary
 import { UserAvatar } from 'src/domains/users';

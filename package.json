@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-force-barrel",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "An ESLint plugin to enforce importing from barrel files (indexes) instead of reaching deep into internal folder structures.",
   "type": "module",
   "main": "./dist/index.js",

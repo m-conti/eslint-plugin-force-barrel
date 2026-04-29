@@ -29,22 +29,51 @@ ruleTester.run('force-barrel', rule, {
   invalid: [
     {
       code: "import { a } from './barrel/a';",
-      options: [{ paths: ["./barrel", "./features"] }],
+      output: "import { a } from './barrel';",
+      options: [{ paths: ["./barrel", "./features"], autoFix: true }],
+      errors: [{ messageId: "useBarrel" }]
+    },
+    {
+      code: "import { a } from \"./barrel/a\";",
+      output: "import { a } from \"./barrel\";",
+      options: [{ paths: ["./barrel", "./features"], autoFix: true }],
       errors: [{ messageId: "useBarrel" }]
     },
     {
       code: "import { a } from './barrel/a/b';",
-      options: [{ paths: ["./barrel", "./features"] }],
+      output: "import { a } from './barrel';",
+      options: [{ paths: ["./barrel", "./features"], autoFix: true }],
       errors: [{ messageId: "useBarrel" }]
     },
     {
       code: "import { a } from 'src/domains/users/components/UserAvatar';",
+      output: "import { a } from 'src/domains/users';",
+      options: [{ autoFix: true }],
+      errors: [{ messageId: "useBarrel" }]
+    },
+    {
+      code: "import { a } from './features/core/nested/deep';",
+      output: "import { a } from './features';",
+      options: [{ paths: ["./barrel", "./features"], autoFix: true }],
       errors: [{ messageId: "useBarrel" }]
     },
     {
       code: "import { a } from './features/core';",
+      output: null, // Test without autoFix via omission
       options: [{ paths: ["./barrel", "./features"] }],
-      errors: [{ messageId: "useBarrel" }]
+      errors: [{ 
+        messageId: "useBarrel", 
+        suggestions: [{ messageId: "replaceWithBarrel", output: "import { a } from './features';" }] 
+      }]
+    },
+    {
+      code: "import { a } from './features/core';",
+      output: null, // Test explicit autoFix: false
+      options: [{ paths: ["./barrel", "./features"], autoFix: false }],
+      errors: [{ 
+        messageId: "useBarrel", 
+        suggestions: [{ messageId: "replaceWithBarrel", output: "import { a } from './features';" }] 
+      }]
     }
   ],
 });
