@@ -85,6 +85,20 @@ export default [
           paths: ["**/domains/*"]
         },
       ],
+      "force-barrel/strict-folder-structure": [
+        "error",
+        {
+          paths: ["**/domains/*"],
+          allowedFolders: ["components", "utils", "types", "api", "constants", "hooks"]
+        },
+      ],
+      "force-barrel/strict-file-structure": [
+        "error",
+        {
+          paths: ["**/domains/*"],
+          allowedFiles: []
+        },
+      ],
     },
   },
 ];
@@ -122,6 +136,20 @@ Add `force-barrel` to the plugins section of your `.eslintrc` configuration file
       {
         "paths": ["**/domains/*"]
       }
+    ],
+    "force-barrel/strict-folder-structure": [
+      "error",
+      {
+        "paths": ["**/domains/*"],
+        "allowedFolders": ["components", "utils", "types", "api", "constants", "hooks"]
+      }
+    ],
+    "force-barrel/strict-file-structure": [
+      "error",
+      {
+        "paths": ["**/domains/*"],
+        "allowedFiles": []
+      }
     ]
   }
 }
@@ -129,7 +157,7 @@ Add `force-barrel` to the plugins section of your `.eslintrc` configuration file
 
 ## Rules
 
-This plugin currently provides four core rules:
+This plugin currently provides six core rules:
 
 ### 1. `force-barrel`
 
@@ -248,4 +276,52 @@ import { UserAvatar } from '@/domains/users';
 // Using relative paths to jump across domains
 import { UserAvatar } from '../users';
 import { UserAvatar } from '../../domains/users';
+```
+
+### 5. `strict-folder-structure`
+
+Enforces a specific folder structure inside your domain directories. If any subfolder is created that is not part of the `allowedFolders` array, the rule will flag it. Files placed directly at the root of the domain folder (like `index.ts`) are evaluated by `strict-file-structure` instead.
+
+**Parameters:**
+- `paths`: Array of glob strings describing your barrel structures (Default: `['**/domains/*']`).
+- `allowedFolders`: Array of allowed folder names at the top root of the matched domain folders (Default: `[]`).
+
+#### ✔️ Correct
+```typescript
+/* allowedFolders: ["components", "utils"] */
+/* files: */
+/* src/domains/users/components/UserAvatar.tsx */
+/* src/domains/users/utils/index.ts */
+/* src/domains/users/index.ts */ // Handled by strict-file-structure or allowed
+```
+
+#### ❌ Incorrect
+```typescript
+/* allowedFolders: ["components", "utils"] */
+/* files: */
+/* src/domains/users/services/api.ts */ // 🚨 "services" is not an allowed folder!
+```
+
+### 6. `strict-file-structure`
+
+Enforces that only whitelisted file names are allowed strictly at the root of the domain directory. Notice that `index.*` files are ignored and always allowed. Any file placed inside an allowed nested folder is bypassed by this rule.
+
+**Parameters:**
+- `paths`: Array of glob strings describing your barrel structures (Default: `['**/domains/*']`).
+- `allowedFiles`: Array of allowed file names at the exact matched root directory (Default: `[]`).
+
+#### ✔️ Correct
+```typescript
+/* allowedFiles: ["types.ts", "constants.ts"] */
+/* files: */
+/* src/domains/users/index.ts */ // Always allowed implicitly
+/* src/domains/users/types.ts */
+/* src/domains/users/constants.ts */
+```
+
+#### ❌ Incorrect
+```typescript
+/* allowedFiles: ["types.ts", "constants.ts"] */
+/* files: */
+/* src/domains/users/helper.ts */ // 🚨 "helper.ts" is not explicitly allowed in the array!
 ```
