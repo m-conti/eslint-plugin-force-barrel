@@ -22,6 +22,28 @@ npm install eslint-plugin-force-barrel --save-dev
 
 ## Usage
 
+### Recommended Config
+
+You can use the recommended configuration, which enables all the plugin's rules as errors.
+
+**Flat Config (ESLint >= 9)**
+
+```javascript
+import forceBarrelPlugin from "eslint-plugin-force-barrel";
+
+export default [
+  forceBarrelPlugin.configs.recommended,
+];
+```
+
+**Legacy Config (`.eslintrc`)**
+
+```json
+{
+  "extends": ["plugin:force-barrel/recommended"]
+}
+```
+
 ### Flat Config (ESLint >= 9)
 
 In your `eslint.config.js`:
@@ -51,6 +73,18 @@ export default [
           privateRegex: "^_"                   // Regex identifying private exports (default: "^_")
         },
       ],
+      "force-barrel/no-barrel-declaration": [
+        "error",
+        {
+          paths: ["**/domains/*"]
+        },
+      ],
+      "force-barrel/no-relative-barrel-import": [
+        "error",
+        {
+          paths: ["**/domains/*"]
+        },
+      ],
     },
   },
 ];
@@ -76,6 +110,18 @@ Add `force-barrel` to the plugins section of your `.eslintrc` configuration file
         "paths": ["**/domains/*"],
         "privateRegex": "^_"
       }
+    ],
+    "force-barrel/no-barrel-declaration": [
+      "error",
+      {
+        "paths": ["**/domains/*"]
+      }
+    ],
+    "force-barrel/no-relative-barrel-import": [
+      "error",
+      {
+        "paths": ["**/domains/*"]
+      }
     ]
   }
 }
@@ -83,7 +129,7 @@ Add `force-barrel` to the plugins section of your `.eslintrc` configuration file
 
 ## Rules
 
-This plugin currently provides two core rules:
+This plugin currently provides four core rules:
 
 ### 1. `force-barrel`
 
@@ -150,4 +196,56 @@ export function publicHelper() {}
 // Busted! A private variable shouldn't leak from the public interface.
 export { _API_ENDPOINTS } from './constants/api';
 export function _privateHelper() {}
+```
+
+### 3. `no-barrel-declaration`
+
+Enforces that no local declarations (variables, functions, classes, types, etc.) are present inside your public domain interface (`index.ts`).
+Barrel files should strictly re-export modules defined in other files rather than declaring any logic directly.
+
+**Parameters:**
+- `paths`: Array of glob strings describing your barrel structures (Default: `['**/domains/*']`).
+
+#### ✔️ Correct (Barrel files strictly re-export logic)
+```typescript
+/* filename: src/domains/users/index.ts */
+
+export { UserAvatar } from './components/UserAvatar';
+export * from './constants/api';
+```
+
+#### ❌ Incorrect (Barrel files CANNOT declare logic directly)
+```typescript
+/* filename: src/domains/users/index.ts */
+
+// Declarations inside the barrel are not allowed! Move logic to a separate file and export it instead.
+export const LOCAL_VALUE = 42;
+export function helper() {}
+class Service {}
+```
+
+### 4. `no-relative-barrel-import`
+
+Enforces that barrel files cannot be imported using relative paths (e.g. `../domains/user` or `./domains/user`).
+You should use absolute paths or aliases (e.g. `src/domains/user` or `@/domains/user`) when importing domains to keep paths clean and refactoring-friendly.
+
+**Parameters:**
+- `paths`: Array of glob strings describing your barrel structures (Default: `['**/domains/*']`).
+
+#### ✔️ Correct
+```typescript
+/* filename: src/domains/orders/index.ts */
+
+// Using absolute path or alias
+import { UserAvatar } from 'src/domains/users';
+import { UserAvatar } from '@/domains/users';
+```
+
+#### ❌ Incorrect
+```typescript
+/* filename: src/domains/orders/index.ts */
+
+// Using relative paths to jump across domains
+import { UserAvatar } from '../users';
+import { UserAvatar } from '../../domains/users';
 ```
